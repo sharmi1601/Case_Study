@@ -1,6 +1,7 @@
 library(ggplot2)
 library(car)
 library(readxl)
+library(MASS)
 
 prostate <- read_excel("C:/Users/sharm/OneDrive/Desktop/MS/Semester - 2/Linear Regression and Time Series/Case_Study/Case_Study/Prostate_Cancer.xlsx")
 
@@ -8,6 +9,8 @@ ggplot(prostate, aes(x = CancerVol, y = PSA)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
   labs(title = "PSA vs. Cancer Volume", x = "Cancer Volume (cc)", y = "PSA (ng/ml)")
+
+summary(prostate$PSA)
 
 summary(prostate$CancerVol)
 
@@ -74,6 +77,30 @@ summary(model_log_log)
 par(mfrow = c(2, 2))
 plot(model_log_log)
 
+# BOX-COX
+
+model_initial <- lm(PSA ~ CancerVol, data = prostate_clean)
+
+# Apply Box-Cox transformation
+boxcox(model_initial, lambda = seq(-2, 2, by = 0.1)) # Test lambda values between -2 and 2
+
+lambda_optimal <- 0.3 # Replace with the chosen lambda from the plot
+
+# Apply transformation
+prostate_clean$PSA_transformed <- ifelse(lambda_optimal == 0,
+                                         log(prostate_clean$PSA),
+                                         (prostate_clean$PSA^lambda_optimal - 1) / lambda_optimal)
+
+# Fit a new regression model with transformed PSA
+model_boxcox <- lm(PSA_transformed ~ CancerVol, data = prostate_clean)
+
+# Summary of the new model
+summary(model_boxcox)
+
+par(mfrow = c(2, 2))
+plot(model_boxcox)
+
+
 # Define new data point for prediction (log-transformed Cancer Volume)
 log_cancer_vol_20 <- log(20)
 
@@ -85,6 +112,8 @@ psa_pred_20 <- exp(log_psa_pred_20)
 
 # Output predicted PSA level
 psa_pred_20
+
+
 
 
 
