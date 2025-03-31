@@ -14,6 +14,21 @@ summary(prostate$PSA)
 
 summary(prostate$CancerVol)
 
+
+# Create histogram for Cancer Volume
+ggplot(prostate, aes(x = CancerVol)) +
+  geom_histogram(bins = 10, fill = 'lightblue', alpha = 0.7) +
+  labs(title = 'Histogram of Cancer Volume', x = 'Cancer Volume (cc)', y = 'Frequency') +
+  theme_minimal()
+
+# Create histogram for PSA Levels
+ggplot(prostate, aes(x = PSA)) +
+  geom_histogram(bins = 10, fill = 'lightgreen', alpha = 0.7) +
+  labs(title = 'Histogram of PSA Levels', x = 'PSA (ng/ml)', y = 'Frequency') +
+  theme_minimal()
+
+
+
 model_initial <- lm(PSA ~ CancerVol, data = prostate)   # Initial Model
 summary(model_initial)
 
